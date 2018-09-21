@@ -30,6 +30,7 @@ contract Reward is Ownable {
     
     ERC20RewardToken public token;
     address public presaleAddress;
+    uint64 public doubleRewardEndTime = 1538006400;
     
     constructor(address _tokenAddr, address _presaleAddr) public {
         token = ERC20RewardToken(_tokenAddr);
@@ -47,8 +48,11 @@ contract Reward is Ownable {
         }
     }
     
-    
-    function calculateValue(uint256 _ethValue, uint8 decimals) pure public returns (uint256 tokensValue) {
+	function setDoubleRewardEndTime(uint64 _time) onlyOwner external {
+		doubleRewardEndTime = _time;
+	}
+	
+    function calculateValue(uint256 _ethValue, uint8 decimals) view public returns (uint256 tokensValue) {
         
         uint8 TokensPerEthereum = 10;
         uint8 additionalBonusPercent = 10;
@@ -74,6 +78,17 @@ contract Reward is Ownable {
             difference = uint256(decimals) - 18;
             tokensValue = tokensValue * 10**difference;
         }
+		
+		// an additional small bonus to compensate for the difference in calculating the recommended price of the egg
+		if(_ethValue > 10**18)
+			tokensValue+= 3 * 10**(uint256(decimals) - 2);
+        
+        if(now <= doubleRewardEndTime)
+            tokensValue*=2;
+    }
+    
+    function () public payable {
+        revert();
     }
     
     function withdraw() onlyOwner external {

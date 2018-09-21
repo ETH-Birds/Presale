@@ -101,16 +101,26 @@ contract Discount is AccessControl {
     }
 }
 
-contract Store is Discount {
+contract StoreLimit is AccessControl {
+	uint8 public saleLimit = 10;
+	
+	function setSaleLimit(uint8 _limit) external onlyOwner {
+		saleLimit = _limit;
+	}
+}
 
-    constructor(address _address) public {
-        parent = ParentInterface(_address);
+contract Store is Discount, StoreLimit {
+
+    constructor(address _presaleAddr) public {
+        parent = ParentInterface(_presaleAddr);
         paused = true;
     }
     
 	// purchasing a parrot
     function purchaseParrot(uint256 _tokenId) external payable whenNotPaused
     {
+		require(_tokenId <= saleLimit);
+		
         uint64 birthTime; uint256 genes; uint64 breedTimeout; uint16 quality; address parrot_owner;
         (birthTime,  genes, breedTimeout, quality, parrot_owner) = parent.getPet(_tokenId);
         

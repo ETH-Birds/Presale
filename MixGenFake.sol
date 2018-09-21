@@ -9,7 +9,7 @@ pragma solidity ^0.4.23;
 
 contract MixGenFake{
     
-    address parent;
+    address public parent;
     
     constructor(address _nftAddr) public {
         parent = _nftAddr;
@@ -17,6 +17,10 @@ contract MixGenFake{
  
     bool public isMixGen = true;
  
+    function () public payable {
+        revert();
+    }
+    
     function openEgg(uint64 userNumber, uint16 eggQuality) public pure returns (uint256 genes, uint16 quality) {
 	  genes = 42120379430592025765448033768736856703739151940001904851365893011+userNumber;
       quality = eggQuality;

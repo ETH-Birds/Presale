@@ -287,16 +287,16 @@ contract EggMinting is PetOwnership{
     
     uint8 public uniquePetsCount = 100;
     
-    uint16 public globalPresaleLimit = 2500;
+    uint16 public globalPresaleLimit = 1500;
 
     mapping (uint16 => uint16) public eggLimits;
     mapping (uint16 => uint16) public purchesedEggs;
     
     constructor() public {
         eggLimits[55375] = 200;
-        eggLimits[48770] = 1100;
-        eggLimits[39904] = 200;
-        eggLimits[32223] = 25;
+        eggLimits[47780] = 400;
+        eggLimits[38820] = 100;
+        eggLimits[31201] = 50;
     }
     
     function totalSupply() public view returns (uint) {
@@ -309,7 +309,7 @@ contract EggMinting is PetOwnership{
 
     function eggAvailable(uint16 quality) constant public returns(bool) {
         // first 100 eggs - only cheap
-        if( quality < 48000 && tokensCount < ( 100 + uniquePetsCount ) )
+        if( quality < 47000 && tokensCount < ( 100 + uniquePetsCount ) )
            return false;
         
         return (eggLimits[quality] > purchesedEggs[quality]);
@@ -319,8 +319,8 @@ contract EggMinting is PetOwnership{
 // Buying eggs from the company
 contract EggPurchase is EggMinting, ExternalContracts {
     
-    uint16[4] discountThresholds =    [20, 100, 500, 1000];
-    uint8[4]  discountPercents   =    [75, 50,  30,  20  ];
+    uint16[4] discountThresholds =    [20, 100, 250, 500];
+    uint8[4]  discountPercents   =    [75, 50,  30,  20 ];
     
 	// purchasing egg
     function purchaseEgg(uint64 userNumber, uint16 quality) external payable whenNotPaused {
@@ -356,7 +356,7 @@ contract EggPurchase is EggMinting, ExternalContracts {
             msg.sender       // owner
         );
         
-        reward.get(msg.sender, eggPrice);
+        reward.get(msg.sender, recommendedPrice(quality));
     }
     
     function getCurrentDiscountPercent() constant public returns (uint8 discount) {
@@ -382,6 +382,7 @@ contract PreSale is EggPurchase {
         
         require(storeAddress != address(0));
         require(address(geneScience) != address(0));
+        require(tokensCount < uniquePetsCount);
         
         uint256 childGenes;
         uint16 childQuality;

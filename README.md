@@ -33,3 +33,7 @@ ERC-20 Token for additional rewards.
 ## Reward.sol
 
 Contract which send ERC-20 tokens by request.
+
+## TokensSender.sol
+
+Sending ZOO Tokens as a reward to the specified list of recipients.
